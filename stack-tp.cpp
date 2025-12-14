@@ -1,119 +1,123 @@
 #include <iostream>
+#include <stdexcept> // Nécessaire pour std::length_error
+#include <string>
 
-// Nous allons implémenter une pile d'entiers de manière très basique.
-// Nous la complexifierons par la suite.
+// --- Fonctions utilitaires ---
 
-// La pile est constituée:
-//    - d'un tableau d'entier, avec sa taille et son nombre d'éléments empilés
-//    - des quatre fonctions: push, pop, top, print, is_empty et is_full
-//      (qui testent si la pile est resp. vide ou pleine)
-//      il faut les utiliser dans votre code de push et pop
-
-void print(int *argv,int size, int nb)
-// cette fonction affiche les entiers empilés
-{
-    int i = 0;
-    while (i < nb)
-    {
-        std::cout << argv[i] << std::endl;
-        i = i + 1;
+void print(int *argv, int size, int nb) {
+    std::cout << "Pile (taille " << nb << "/" << size << ") : [ ";
+    for (int i = 0; i < nb; ++i) {
+        std::cout << argv[i] << " ";
     }
+    std::cout << "[" << std::endl;
 }
 
-// renvoie true si la pile est vide, false sinon
-bool is_empty(int *argv,int size, int nb)
-{
-    if (nb==0){
-        std::cout<<true<<std::endl;
+// Renvoie true si la pile est vide
+bool is_empty(int *argv, int size, int nb) {
+    return (nb == 0);
+}
+
+// Renvoie true si la pile est pleine
+bool is_full(int *argv, int size, int nb) {
+    return (nb == size);
+}
+
+// --- Fonctions principales ---
+
+// Ajoute un entier. 
+// Note : nb est passé par référence (&nb) pour être modifié.
+void push(int *argv, int size, int &nb, int a) {
+    // Vérification : Pointeur nul (si la stack est mal créée)
+    if (argv == nullptr) {
+        throw std::invalid_argument("Erreur: La pile n'est pas allouée (pointeur null).");
     }
-    std::cout<<false<<std::endl;
-}
 
-// renvoie true si la pile est pleine, false sinon
-bool is_full(int *argv,int size, int nb)
-{
-    if (nb==size){
-        std::cout<<true<<std::endl;
+    // Vérification : Pile pleine
+    if (is_full(argv, size, nb)) {
+        throw std::length_error("Erreur push: La pile est pleine !");
     }
-    std::cout<<false<<std::endl;
+    
+    // Si tout va bien
+    argv[nb] = a;
+    nb += 1;
 }
 
-
-void push(int *argv,int size, int nb,int a)
-// cette fonction ajoute un entier à la pile passé en argument
-// elle doit s'assurer que la pile n'est pas pleine avant d'empiler
-// elle lance une exception si problème
-{
-    if (not is_full(argv,size, nb)){
-    argv[nb]=a;
-    nb+=1; 
+// Retourne l'élément du haut sans dépiler
+int top(int *argv, int size, int nb) {
+    if (argv == nullptr) throw std::invalid_argument("Erreur: Pointeur null.");
+    
+    if (is_empty(argv, size, nb)) {
+        throw std::length_error("Erreur top: La pile est vide !");
     }
-   throw std::length_error(std::string("we throw an exception of type: length_error ")); // votre code ici
+    
+    return argv[nb - 1];
 }
 
-int top(int *argv,int size, int nb) // (cette fonction ne dépile pas)
-// cette fonction retourne l'entier en haut de la pile (le dernier empilé)
-// à la sortie de cette fonction l'élément retourné reste dans la pile
-// elle doit s'assurer que la pile n'est pas vide avant de la dépiler
-// elle lance une exception si problème
-{
-    if (not is_empty(argv,size,nb)){
-        std::cout<<argv[nb-1]<<std::endl;
-    }// votre code ici
-    throw std::length_error(std::string("we throw an exception of type: length_error "));
+// Retourne l'élément du haut et dépile
+// Note : nb est passé par référence (&nb)
+int pop(int *argv, int size, int &nb) {
+    if (argv == nullptr) throw std::invalid_argument("Erreur: Pointeur null.");
+
+    if (is_empty(argv, size, nb)) {
+        throw std::length_error("Erreur pop: La pile est vide !");
+    }
+
+    nb -= 1;
+    return argv[nb];
 }
 
-int pop(int *argv,int size, int nb) // (cette fonction dépile)
-// cette fonction retourne l'entier en haut de la pile (le dernier empilé)
-// à la sortie de cette fonction l'élément retourné n'est plus compté dans la pile
-// elle doit s'assurer que la pile n'est pas vide avant de la dépiler
-// elle lance une exception si problème
-{
-    if (not is_empty(argv,size,nb)){
-        top(argv,size,nb);
-        nb-=1;
-    }// votre code ici
-    throw std::length_error(std::string("we throw an exception of type: length_error "));
+// --- Gestion Mémoire ---
 
+int* create(int size) {
+    // Allocation dynamique dans le tas (Heap)
+    int* t = new int[size]; 
+    return t;
 }
 
-#include <stdexcept>
-// https://en.cppreference.com/w/cpp/header/stdexcept.html
-// pour un exemple d'exception voir le fichier exception.cpp
+void delete_stack(int *argv) {
+    delete[] argv;
+}
 
-int main()
-{
+// --- Main ---
 
-    // on définit les 3 variables constituant la pile
+int main() {
     int size = 5;
-    int stack[size];
     int nb = 0;
+    
+    // Création propre avec new via la fonction create
+    int* mon_tableau = create(size); 
 
-    // rajoutez aux blocks catch les erreurs
-    // pouvant être déclenchées par les opérations sur la pile
-    try
-    {
-        print(stack, size, nb); // affiche [ [
-        push(stack, size, nb, -17);
+    try {
+        std::cout << "--- Test 1: Remplissage ---" << std::endl;
+        push(mon_tableau, size, nb, 10);
+        push(mon_tableau, size, nb, 20);
+        push(mon_tableau, size, nb, 30);
+        print(mon_tableau, size, nb);
 
-        // on affiche l'élément en haut de pile
-        std::cout << top(stack, size, nb) << std::endl; // affiche -17
+        std::cout << "\n--- Test 2: Top et Pop ---" << std::endl;
+        std::cout << "Top element: " << top(mon_tableau, size, nb) << std::endl; // Affiche 30
+        
+        int element_enleve = pop(mon_tableau, size, nb); // Enlève 30
+        std::cout << "Element pop: " << element_enleve << std::endl;
+        print(mon_tableau, size, nb); // Reste 10, 20
 
-        print(stack, size, nb); // affiche [-17 90 [
-
-        int e = pop(stack, size, nb);
-        std::cout << e << std::endl;
-        print(stack, size, nb); // affiche [-17 [
-
-        push(stack, size, nb, 20);
-        push(stack, size, nb, -78);
-        push(stack, size, nb, -9);
-        push(stack, size, nb, -56);
-        push(stack, size, nb, -9);
-        push(stack, size, nb, 68);
+        std::cout << "\n--- Test 3: Provoquer une erreur (Pile Pleine) ---" << std::endl;
+        push(mon_tableau, size, nb, 30);
+        push(mon_tableau, size, nb, 40);
+        push(mon_tableau, size, nb, 50); // Pile est pleine ici (5 éléments)
+        print(mon_tableau, size, nb);
+        
+        // Cette ligne va déclencher l'exception car la taille max est 5
+        std::cout << "Tentative d'ajout du 6eme element..." << std::endl;
+        push(mon_tableau, size, nb, 60); 
     }
-    catch (...)
-    {
-        // ce catch ramasse toutes les exceptions...
+    catch (const std::exception& e) {
+        // Affiche le message d'erreur spécifique défini dans le throw
+        std::cerr << "EXCEPTION ATTRAPEE : " << e.what() << std::endl;
     }
+
+    // Libération de la mémoire
+    delete_stack(mon_tableau);
+
+    return 0;
 }
