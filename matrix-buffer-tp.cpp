@@ -49,6 +49,7 @@
 //   - the use of const to avoid modification of the filename
 //     (but also to allow passing string literals such as "data.txt")
 //   - we return the vector containing the read values by copying it
+
 std::vector<double> read_doubles_from_file(const std::string &filename)
 {
     std::vector<double> values;

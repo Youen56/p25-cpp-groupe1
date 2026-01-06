@@ -49,7 +49,10 @@
 // (i.e. libérer les cellules quand elles ne sont plus utilisées)
 
 // Voici un exemple de main qui doit fonctionner avec votre liste chaînée:
-
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <stdexcept>
 struct Cell {
   int num;
   int* loc;
