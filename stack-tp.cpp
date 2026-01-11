@@ -4,6 +4,95 @@
 
 // --- Fonctions utilitaires ---
 
+
+class Stack{
+    private:
+        int* pile;
+        int size;
+        int nb;
+    public:
+    Stack(int a): size(a),nb(0){
+        pile= new int[size];
+    }
+    ~Stack(){
+        delete[] pile;
+    }
+    Stack(const Stack& other) : size(other.size), nb(other.nb) {
+        // On alloue un NOUVEAU tableau indépendant
+        pile = new int[size];
+        
+        // On copie les valeurs une par une
+        for (int i = 0; i < nb; ++i) {
+            pile[i] = other.pile[i];
+    }
+}
+    Stack& operator=(const Stack& other) {
+        if (this == &other) {
+            return *this; 
+        }
+        delete[] pile;
+        size = other.size;
+        nb = other.nb;
+        pile = new int[size];
+        for (int i = 0; i < nb; ++i) {
+            pile[i] = other.pile[i];
+        }
+        return *this;
+    }
+    void print(int *argv, int size, int nb) {
+    std::cout << "Pile (taille " << nb << "/" << size << ") : [ ";
+    for (int i = 0; i < nb; ++i) {
+        std::cout << argv[i] << " ";
+    }
+    std::cout << "[" << std::endl;
+}
+
+// Renvoie true si la pile est vide
+bool is_empty() {
+    return (nb == 0);
+}
+
+// Renvoie true si la pile est pleine
+bool is_full() {
+    return (nb == size);
+}
+
+// --- Fonctions principales ---
+
+// Ajoute un entier. 
+// Note : nb est passé par référence (&nb) pour être modifié.
+void push(int a) {
+    
+    if (is_full()) {
+        throw std::length_error("Erreur push: La pile est pleine !");
+    }
+    
+    // Si tout va bien
+    pile[nb] = a;
+    nb += 1;
+}
+
+// Retourne l'élément du haut sans dépiler
+int top() {
+    if (is_empty()) {
+        throw std::length_error("Erreur top: La pile est vide !");
+    }
+    
+    return pile[nb - 1];
+}
+
+// Retourne l'élément du haut et dépile
+int pop() {
+    
+    if (is_empty()) {
+        throw std::length_error("Erreur pop: La pile est vide !");
+    }
+
+    nb -= 1;
+    return pile[nb];
+}
+};
+
 void print(int *argv, int size, int nb) {
     std::cout << "Pile (taille " << nb << "/" << size << ") : [ ";
     for (int i = 0; i < nb; ++i) {
