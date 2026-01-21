@@ -54,7 +54,7 @@ struct Node
           if ((right!= nullptr) and (v>value)){
                return right->search(v);
           }
-          else{.     
+          else{
           return false; 
           }
      }
