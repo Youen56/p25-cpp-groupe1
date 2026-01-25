@@ -64,6 +64,12 @@ class Rectangle : public Shape{
   int he;
 public:
   Rectangle(int xx, int yy, int w, int h): Shape(xx,yy),wi(w),he(h){
+    if (w<0){
+      throw std::invalid_argument(std::string("we throw an exception of type: invalid argument: rectangle cannot have a negative width"));
+    }
+    if (h<0){
+      throw std::invalid_argument(std::string("we throw an exception of type: invalid argument: rectangle cannot have a negative height"));
+    }
   }
   double area(){
     return wi*he;

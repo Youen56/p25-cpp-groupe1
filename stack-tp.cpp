@@ -6,6 +6,8 @@
 
 
 class Stack{
+    friend std::ostream &operator<<(std::odtream &os, const Stack &st);
+    
     private:
         int* pile;
         int size;
