@@ -33,7 +33,7 @@ public:
         return number;
     }
 
-    void print() const override {
+    void print() const override { //cpp17, avant ça
         std::cout << number << " ";
     }
 };
