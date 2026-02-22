@@ -27,7 +27,7 @@ struct Vertex{
         }
     }
     void add(Edge a){
-        v.push_back(a);
+        //v.push_back(a);
 
     }
     

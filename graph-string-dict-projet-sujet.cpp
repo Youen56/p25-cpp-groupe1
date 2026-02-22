@@ -62,21 +62,117 @@
 #include <vector>
 #include <unordered_map>
 #include <set>
-class Edge
-{
-    /* votre code ici */
-};
-class Vertex
-{
-    /* votre code ici */
+class Edge {
+    friend class Graph;
+    friend class Vertex;
+private:
+    class Vertex* destination;
+    double poids;
+
+    Edge(Vertex* dest, double w) : destination(dest), poids(w) {}
 };
 
-class Graph
-{
-    /* votre code ici */
+class Vertex {
+    friend class Graph;
+private:
+    std::string name;
+    std::vector<Edge*> aretes; // Liste des arêtes partantes
+
+    Vertex(const std::string& n) : name(n) {}
+    
+    // Le destructeur du sommet supprime ses propres arêtes
+    ~Vertex() {
+        for (Edge* e : aretes) {
+            delete e;
+        }
+    }
+};
+
+class Graph {
+private:
+    std::vector<Vertex*> matrice; //liste de liste de points, avec leurs adjacences
+    std::unordered_map<std::string, int> name_to_index;// j'ai utilisé de l'IA pour comprendre le fonctionnement de unordered_map: séparation en cases de chaine pour accès simplifié
+    std::vector<std::vector<double>> adj_matrice;
+
+//fonction d'exploration
+    void dfs_recursive(Vertex* v, std::set<std::string>& visited) {
+        visited.insert(v->name);
+        std::cout << v->name << " ";
+
+        for (Edge* e : v->aretes) {
+            if (visited.find(e->destination->name) == visited.end()) {
+                dfs_recursive(e->destination, visited);
+            }
+        }
+    }
+
 public:
-    void add_edge(const std::string &begin, const std::string &end, double value) {}
-    void dfs() {}
+    Graph() {}
+
+    ~Graph() {
+        for (Vertex* v : matrice) {
+            delete v;
+        }
+    }
+
+    void add_edge(const std::string& begin, const std::string& end, double value) {
+        if (name_to_index.find(begin) == name_to_index.end()) {
+            name_to_index[begin] = matrice.size();
+            matrice.push_back(new Vertex(begin));
+        }
+        if (name_to_index.find(end) == name_to_index.end()) {
+            name_to_index[end] = matrice.size();
+            matrice.push_back(new Vertex(end));
+        }
+
+        // création des arretes
+        Vertex* v_begin = matrice[name_to_index[begin]];
+        Vertex* v_end = matrice[name_to_index[end]];
+        
+        v_begin->aretes.push_back(new Edge(v_end, value));
+    }
+
+    void dfs() {
+        std::set<std::string> visited;
+        std::cout << "Parcours DFS : ";
+        for (Vertex* v : matrice) {
+            if (visited.find(v->name) == visited.end()) {
+                dfs_recursive(v, visited);
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    void matrice_adj() {
+        int n = matrice.size();
+        double INF = std::numeric_limits<double>::infinity();
+        adj_matrice.assign(n, std::vector<double>(n, INF));//init
+        for (int i = 0; i < n; ++i) {
+            adj_matrice[i][i] = 0.0;//la diagonale du vide
+        }
+        // Remplissage avec les arêtes existantes
+        for (int i = 0; i < n; ++i) {
+            for (Edge* e : matrice[i]->aretes) {
+                int j = name_to_index[e->destination->name];
+                adj_matrice[i][j] = e->poids;
+            }
+        }
+    }
+
+    void floyd_warshall() {
+        matrice_adj();
+        int n = matrice.size();
+        // k est le sommet intermédiaire
+        for (int k = 0; k < n; ++k) {
+            for (int i = 0; i < n; ++i) {
+                for (int j = 0; j < n; ++j) {
+                    if (adj_matrice[i][k] + adj_matrice[k][j] < adj_matrice[i][j]) {
+                        adj_matrice[i][j] = adj_matrice[i][k] + adj_matrice[k][j];
+                    }
+                }
+            }
+        }
+    }
 };
 
 Graph read_triplet(const std::string &filename)
