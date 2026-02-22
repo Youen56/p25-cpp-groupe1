@@ -135,7 +135,7 @@ public:
 
 /*
 ================================================================================
-EXPLICATIONS DU CODE GÉNÉRÉ PAR L'IA (Consignes 9.ii et 9.iii)
+EXPLICATIONS DU CODE GÉNÉRÉ PAR L'IA 
 ================================================================================
 
 Ce code utilise plusieurs concepts du C++ moderne (C++11 et ultérieurs) qui 
